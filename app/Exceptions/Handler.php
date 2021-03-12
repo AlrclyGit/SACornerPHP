@@ -13,9 +13,11 @@ use Throwable;
 class Handler extends ExceptionHandler
 {
 
-    private $code;
-    private $msg;
     private $errorCode;
+    private $msg;
+    private $data;
+    private $code;
+
 
     /**
      * A list of the exception types that are not reported.
@@ -61,10 +63,10 @@ class Handler extends ExceptionHandler
     public function render($request, Throwable $exception)
     {
         if ($exception instanceof BaseExceptions) {
-            $this->code = $exception->code;
             $this->errorCode = $exception->errorCode;
             $this->msg = $exception->msg;
             $this->data = $exception->data;
+            $this->code = 200;
         } else {
             if (config('app.debug')) {
                 if (method_exists($exception, 'render') && $response = $exception->render($request)) {

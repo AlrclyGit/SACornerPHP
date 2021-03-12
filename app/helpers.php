@@ -44,7 +44,7 @@ function getRandChar($length = 16)
 function saReturn($data = [],$code = 0, $msg ='YesOK')
 {
     $result = [
-        'code' => $code,
+        'error_code' => $code,
         'msg' => $msg,
         'data' => $data,
     ];

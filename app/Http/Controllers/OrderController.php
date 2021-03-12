@@ -22,7 +22,7 @@ class OrderController extends Controller
 
 
     /*
-     * 订单记录详情
+     * 获取订单记录详情
      */
     public function getDetail(IDMustBePositiveInt $request)
     {

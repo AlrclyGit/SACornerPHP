@@ -19,8 +19,6 @@ class BaseExceptions extends RuntimeException
     public $msg = '默认消息';
     // 附带的内容
     public $data = [];
-    // HTTP 状态码
-    public $code = 500;
 
     /*
      *
