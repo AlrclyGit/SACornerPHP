@@ -29,6 +29,8 @@ Route::post('token/verify', 'TokenController@verifyToken');
 
 Route::get('user_info', 'UserInfoController@getUserInfo');
 
+Route::get('receive_notify', 'PayController@receiveNotify');
+
 
 // 仅用户可访问 权限
 Route::middleware('userToken')->group(function () {

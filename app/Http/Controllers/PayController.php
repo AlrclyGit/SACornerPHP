@@ -35,7 +35,6 @@ class PayController extends Controller
      */
     public function receiveNotify()
     {
-        //
         $notify = new WxNotifyService();
         $config = new \WxPayConfig();
         $notify->Handle($config);

@@ -1,6 +1,6 @@
 <?php
 /**
- * Name:
+ * Name: 支付服务
  * User: 萧俊介
  * Date: 2020/9/7
  * Time: 10:57 上午
@@ -12,17 +12,14 @@ namespace App\Service;
 
 use App\Enums\OrderStatusEnum;
 use App\Exceptions\BaseExceptions;
-use App\Exceptions\OrderException;
-use App\Exceptions\TokenException;
 use App\Models\Order;
 use App\Models\User;
 
 
 class PayService
 {
-    //
+    // 声明变量
     private $orderID;
-    private $orderNO;
 
     /*
      * 构造方法
@@ -31,6 +28,7 @@ class PayService
     {
         if (!$orderID) {
             throw new BaseExceptions([
+                'errorCode' => 82001,
                 'msg' => '订单号不允许为NULL'
             ]);
         }
@@ -42,43 +40,70 @@ class PayService
      */
     public function pay()
     {
-        // 检测支付来源数据的可靠性
-        $this->checkOrderValid();
-        // 检测库存信息
-        $orderService = new OrderService();
-        $statue = $orderService->checkOrderStock($this->orderID);
-        if (!$statue['pass']) {
-            return $statue;
-        }
+        // 检测支付来源数据的可靠性,并获取订单内容
+        $statue = $this->checkOrderValid();
         // 发送预订单请求
-        return $this->makeWxPreOrder($statue['orderPrice']);
+        return $this->makeWxPreOrder($statue);
+    }
+
+    /*
+    * 检测支付来源数据的可靠性
+    */
+    private function checkOrderValid()
+    {
+        // 订单号根本不存在
+        $order = Order::find($this->orderID);
+        if (!$order) {
+            throw new BaseExceptions([
+                'errorCode' => 82002,
+                'msg' => '订单不存在，请检查ID'
+            ]);
+        }
+        // 订单号和当前用户不匹配
+        if (!TokenService::isValidOperate($order->user_id)) {
+            throw new BaseExceptions([
+                'errorCode' => 82002,
+                'msg' => '订单用户与订单用户不匹配'
+            ]);
+        }
+        // 订单已支付
+        if ($order->status != OrderStatusEnum::UNPAID) {
+            throw new BaseExceptions([
+                'errorCode' => 82003,
+                'msg' => '订单已支付过啦',
+            ]);
+        }
+        return $order;
     }
 
     /*
      * 发送预订单请求（拼装数组）
      */
-    private function makeWxPreOrder($totalPrice)
+    private function makeWxPreOrder($statue)
     {
-        // openid
+        // 获取用户Uid
         $uid = TokenService::getCurrentUid();
+        // 获取用户信息
         $user = User::find($uid);
-        $openid = $user['openid'];
-        if (!$openid) {
-            throw new TokenException();
+        // 判断用户是否存在
+        if (!$user['openid']) {
+            throw new BaseExceptions([
+                'errorCode' => 82004,
+                'msg' => '用户OpenID不存在',
+            ]);
         }
-
-        // 发送预订单请求
+        // 拼装预订单请求参数
         $wxOrderData = new \WxPayUnifiedOrder();
-        $wxOrderData->SetOut_trade_no($this->orderNO);
+        $wxOrderData->SetOut_trade_no($statue['order_no']);
         $wxOrderData->SetTrade_type('JSAPI');
-        $wxOrderData->SetTotal_fee($totalPrice * 100);
+        $wxOrderData->SetTotal_fee($statue['orderPrice'] * 100);
         $wxOrderData->SetBody('漫才文创社');
-        $wxOrderData->SetOpenid($openid);
-        $wxOrderData->SetNotify_url(config('secure.pay_back_url'));
-        //
-        $config = new \WxPayConfig();
-        //
-        return $this->getPaySignature($config, $wxOrderData);
+        $wxOrderData->SetOpenid($user['openid']);
+        $wxOrderData->SetNotify_url(config('wx.pay_back_url'));
+        // 获取微信支付配置
+        $wxPayConfig = new \WxPayConfig();
+        // 发送预订单请求（请求处理）
+        return $this->getPaySignature($wxPayConfig, $wxOrderData);
     }
 
     /*
@@ -94,12 +119,10 @@ class PayService
 //            Log::record('获取预订单失败', 'error');
             return $wxOrder;
         } else { // 预订单生成成功
-            // 写入通知参数
+            // 写入微信回调参数
             $this->recordPreOrder($wxOrder);
             // 制作签名
-            $signature = $this->sign($wxOrder);
-            // 返回
-            return $signature;
+            return $this->sign($wxOrder);
         }
     }
 
@@ -123,46 +146,14 @@ class PayService
     }
 
     /*
-     * 写入通知参数
+     * 写入微信回调参数
      */
     private function recordPreOrder($wxOrder)
     {
-        $data = [
-            'prepay_id' => $wxOrder['prepay_id']
-        ];
-        $where = [
-            'id' => $this->orderID
-        ];
-        Order::update($data, $where);
+        $order = Order::find($this->orderID);
+        $order->prepay_id = $wxOrder['prepay_id'];
+        $order->save();
     }
 
-    /*
-     * 检测支付来源数据的可靠性
-     */
-    private function checkOrderValid()
-    {
-        // 订单号根本不存在
-        $order = Order::find($this->orderID);
-        if (!$order) {
-            throw new OrderException();
-        }
-        // 订单号和当前用户不匹配
-        if (!TokenService::isValidOperate($order->user_id)) {
-            throw new TokenException([
-                'msg' => '订单用户与订单用户不匹配',
-                'errorCode' => 80002
-            ]);
-        }
-        // 订单已支付
-        if ($order->status != OrderStatusEnum::UNPAID) {
-            throw new OrderException([
-                'code' => 400,
-                'msg' => '订单已支付过啦',
-                'errorCode' => 80003,
-            ]);
-        }
-        $this->orderNO = $order->order_no;
-        return true;
-    }
 
 }
