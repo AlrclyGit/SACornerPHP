@@ -9,7 +9,6 @@
 
 namespace App\Http\Middleware;
 
-use App\Exceptions\BaseExceptions;
 use App\Service\TokenService;
 use Closure;
 
@@ -17,11 +16,7 @@ class VerifyUserToken
 {
     public function handle($request, Closure $next)
     {
-        if (TokenService::needExclusiveScope()) {
-            return $next($request);
-        }
-        throw new BaseExceptions([
-            'msg' => 'User'
-        ]);
+        TokenService::needExclusiveScope();
+        return $next($request);
     }
 }

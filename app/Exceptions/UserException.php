@@ -12,12 +12,8 @@ namespace App\Exceptions;
 
 class UserException extends BaseExceptions
 {
-    // HTTP 状态码
-    public $code = 400;
-    // 自定义的错误码
-    public $errorCode = 30000;
-    // 错误具体信息
-    public $msg = '用户信息相关错误';
-    // 附带的内容
-    public $data = [];
+    public function __construct($errorCode = 30000, $msg = '用户信息相关错误', $data = [], $code = 200)
+    {
+        parent::__construct($errorCode, $msg, $data, $code);
+    }
 }

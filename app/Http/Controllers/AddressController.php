@@ -45,10 +45,7 @@ class AddressController extends Controller
         $userAddress = User::with('address')->find($uid);
         // 判断用户地址是否存在
         if(!$userAddress['address']){
-            throw new UserException([
-                'msg' => '用户地址不存在',
-                'errorCode' => '30001'
-            ]);
+            throw new UserException(30001,'用户地址不存在');
         }
         // 返回成功消息
         return saReturn($userAddress);

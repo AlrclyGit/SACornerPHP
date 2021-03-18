@@ -66,7 +66,7 @@ class Handler extends ExceptionHandler
             $this->errorCode = $exception->errorCode;
             $this->msg = $exception->msg;
             $this->data = $exception->data;
-            $this->code = 200;
+            $this->code = $exception->code;
         } else {
             if (config('app.debug')) {
                 if (method_exists($exception, 'render') && $response = $exception->render($request)) {
@@ -84,9 +84,9 @@ class Handler extends ExceptionHandler
                 }
                 return $this->prepareJsonResponse($request, $exception);
             } else {
-                $this->code = 500;
+                $this->errorCode = $exception->errorCode;
                 $this->msg = '服务器内部错误，不想告诉你';
-                $this->errorCode = 999;
+                $this->code = 500;
 //                $this->recordErrorLog($exception);
             }
         }
@@ -94,7 +94,6 @@ class Handler extends ExceptionHandler
             'error_code' => $this->errorCode,
             'msg' => $this->msg,
             'data' => $this->data,
-            'request_url' => $request->fullUrl()
         ];
         return response()->json($result, $this->code);
     }

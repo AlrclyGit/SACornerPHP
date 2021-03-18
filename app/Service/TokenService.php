@@ -52,12 +52,11 @@ class TokenService
      */
     static public function getCurrentToKenVar($key)
     {
+
         // 获取 Token 原始数据
         $token = Request::header('token');
         if (empty($token)) {
-            throw new TokenException([
-                'msg' => '检测到token为空'
-            ]);
+            throw new TokenException(20005, '检测到token为空');
         }
         // Token 原始数据转为数组
         $tokenArray = explode('.', $token);
@@ -67,23 +66,17 @@ class TokenService
         // 验证数据的合法性
         $localSignature = self::getSignature($header, $payload);
         if ($localSignature !== $signature) {
-            throw new TokenException([
-                'msg' => '无效Token'
-            ]);
+            throw new TokenException(20004,'无效Token');
         }
         // payload 部分转为数组
         $value = json_decode(base64_decode($payload), true);
         // 效验 Token 是否已经过期
         if ($value['expire'] < time()) {
-            throw new TokenException([
-                'msg' => 'Token已过期'
-            ]);
+            throw new TokenException(20001, 'Token已过期');
         }
         // 查询数组里时候有该值
         if (!array_key_exists($key, $value)) {
-            throw new TokenException([
-                'msg' => '尝试获取的Token变量不存在'
-            ]);
+            throw new TokenException(20006, '尝试获取的Token变量不存在');
         }
         // 返回
         return $value[$key];
@@ -104,7 +97,7 @@ class TokenService
     static public function isValidOperate($checkedUID)
     {
         if (!$checkedUID) {
-            throw new TokenException('检测UID时必须传入一个被检测的UID');
+            throw new TokenException(20003,'检测UID时必须传入一个被检测的UID');
         }
         $currentOperateUID = self::getCurrentUid();
         if ($currentOperateUID == $checkedUID) {
@@ -118,21 +111,19 @@ class TokenService
      */
     public static function needExclusiveScope()
     {
+        // 获取权限信息
         $scope = self::getCurrentToKenVar('scope');
-        $expire = self::getCurrentToKenVar('expire');
         if ($scope) {
-            if($expire < time()){
-                throw new TokenException();
-            }
             if ($scope == ScopeEnum::User) {
                 return true;
             } else {
-                throw new ForbiddenException();
+                throw new ForbiddenException(10001, '用户权限不够');
             }
         } else {
-            throw new TokenException();
+            throw new TokenException(20002, '获取不到Token的权限信息');
         }
     }
+
 
     /*
      * 权限验证方法（管理员和用户）
@@ -140,18 +131,14 @@ class TokenService
     public static function needPrimaryScope()
     {
         $scope = self::getCurrentToKenVar('scope');
-        $expire = self::getCurrentToKenVar('expire');
         if ($scope) {
-            if($expire < time()){
-                throw new TokenException();
-            }
-            if ($scope >= ScopeEnum::User) {
+            if ($scope == ScopeEnum::User) {
                 return true;
             } else {
-                throw new ForbiddenException();
+                throw new ForbiddenException(10001, '用户权限不够');
             }
         } else {
-            throw new TokenException();
+            throw new TokenException(20002, '获取不到Token的权限信息');
         }
     }
 

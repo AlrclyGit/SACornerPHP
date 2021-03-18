@@ -45,20 +45,12 @@ class UserTokenService extends TokenService
         $wxResult = json_decode($result, true);
         // 如果结果为空
         if (empty($wxResult)) {
-            throw new WeChatException([
-                'errorCode' => 91001,
-                'msg' => '获取session_key及openID时异常，微信内部错误',
-                'data' => $wxResult
-            ]);
+            throw new WeChatException($wxResult, 91001, '获取session_key及openID时异常，微信内部错误');
         } else {
             // 如果结果存在错误
             $loginFail = array_key_exists('errcode', $wxResult);
             if ($loginFail) {
-                throw new WeChatException([
-                    'errorCode' => 91002,
-                    'msg' => 'code可能是无效的',
-                    'data' => $wxResult
-                ]);
+                throw new WeChatException($wxResult, 91002, 'code可能是无效的');
             }
         }
         // 传入获取 Token 的方法并返回
@@ -75,10 +67,10 @@ class UserTokenService extends TokenService
         // 查询用户是否存在
         $user = User::where(['openid' => $wxResult['openid']])->first();
         // 存在则更新session_key,否则添加用户数据
-        if($user){
+        if ($user) {
             $user->session_key = $wxResult['session_key'];
             $user->save();
-        }else{
+        } else {
             $user = new User;
             $user->openid = $wxResult['openid'];
             $user->session_key = $wxResult['session_key'];

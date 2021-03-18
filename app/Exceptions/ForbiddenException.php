@@ -1,10 +1,10 @@
 <?php
 /**
- * Name:
+ * Name: 权限相关错误
  * User: 萧俊介
- * Date: 2020/9/4
- * Time: 2:37 下午
- * Created by SANewOrangePHP制作委员会.
+ * Date: 2021/3/18
+ * Time: 4:04 下午
+ * Created by SACornerPHP制作委员会.
  */
 
 namespace App\Exceptions;
@@ -12,7 +12,8 @@ namespace App\Exceptions;
 
 class ForbiddenException extends BaseExceptions
 {
-    public $code = 403;
-    public $errorCode = 10000;
-    public $msg = '权限不够';
+    public function __construct($errorCode = 10000, $msg = '权限相关错误', $data = [], $code = 200)
+    {
+        parent::__construct($errorCode, $msg, $data, $code);
+    }
 }

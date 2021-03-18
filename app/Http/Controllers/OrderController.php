@@ -9,7 +9,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Exceptions\OrderException;
 use App\Http\Requests\IDMustBePositiveInt;
 use App\Http\Requests\OrderPlace;
 use App\Models\Order;

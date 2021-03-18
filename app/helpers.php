@@ -41,10 +41,10 @@ function getRandChar($length = 16)
 /**
  * 正常的返回值
  */
-function saReturn($data = [],$code = 0, $msg ='YesOK')
+function saReturn($data = [],$msg ='YesOK',$errorCoce = 0)
 {
     $result = [
-        'error_code' => $code,
+        'error_code' => $errorCoce,
         'msg' => $msg,
         'data' => $data,
     ];

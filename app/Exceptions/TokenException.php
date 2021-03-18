@@ -12,12 +12,9 @@ namespace App\Exceptions;
 
 class TokenException extends BaseExceptions
 {
-    // HTTP 状态码
-    public $code = 401;
-    // 自定义的错误码
-    public $errorCode = 20000;
-    // 错误具体信息
-    public $msg = 'Token已过期或无效Token';
-    // 附带的内容
-    public $data = [];
+    public function __construct($errorCode = 20000, $msg = 'Token相关错误', $data = [], $code = 401)
+    {
+        parent::__construct($errorCode, $msg, $data, $code);
+    }
+
 }
