@@ -9,6 +9,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Exceptions\EmptyException;
 use App\Http\Requests\IDMustBePositiveInt;
 use App\Http\Requests\OrderPlace;
 use App\Models\Order;
@@ -31,9 +32,9 @@ class OrderController extends Controller
         $orderDetail = Order::find($validated['id']);
         // 错误处理与隐藏字段并返回
         if (!$orderDetail) {
-            throw new OrderException();
+            throw new EmptyException(83001,'订单不存在，请检查ID');
         }
-        return $orderDetail;
+        return saReturn($orderDetail);
     }
 
     /*

@@ -9,7 +9,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Exceptions\UserException;
+use App\Exceptions\EmptyException;
 use App\Http\Requests\AddressNew;
 use App\Models\User;
 use App\Service\TokenService;
@@ -45,7 +45,7 @@ class AddressController extends Controller
         $userAddress = User::with('address')->find($uid);
         // 判断用户地址是否存在
         if(!$userAddress['address']){
-            throw new UserException(30001,'用户地址不存在');
+            throw new EmptyException(30001,'用户地址不存在');
         }
         // 返回成功消息
         return saReturn($userAddress);

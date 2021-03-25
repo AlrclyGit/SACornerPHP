@@ -10,7 +10,7 @@
 namespace App\Service;
 
 
-use App\Exceptions\BaseExceptions;
+use App\Exceptions\EmptyException;
 use App\Models\Order;
 use App\Models\OrderProduct;
 use App\Models\Product;
@@ -66,10 +66,7 @@ class OrderService
     {
         $userAddress = UserAddress::where('user_id', '=', $this->uid)->first();
         if (!$userAddress) {
-            throw new BaseExceptions([
-                'msg' => '用户收货地址不存在，下单失败',
-                'errorCode' => 81002
-            ]);
+            throw new EmptyException(81002,'用户收货地址不存在，下单失败');
         }
         return $userAddress;
     }
@@ -108,10 +105,7 @@ class OrderService
         }
         if ($pIndex == -1) {
             // 商品不存在
-            throw new BaseExceptions([
-                'errorCode' => 81001,
-                'msg' => 'ID为' . $oPID . '商品不存在，创建订单失败'
-            ]);
+            throw new EmptyException(81001, 'ID为' . $oPID . '商品不存在，创建订单失败');
         }
         // 商品存在
         $product = $products[$pIndex]; // 商品索引
@@ -123,11 +117,7 @@ class OrderService
         $productStatue['total_price'] = $product['price'] * $oCount; // 商品总价
         // 判断商品是否足够
         if ($product['stock'] - $oCount >= 0) {
-            throw new BaseExceptions([
-                'errorCode' => 81003,
-                'msg' => '商品库存不足',
-                'data' => $productStatue
-            ]);
+            throw new EmptyException(81003, '商品库存不足', $productStatue);
         }
         return $productStatue;
     }

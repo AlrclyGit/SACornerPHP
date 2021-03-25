@@ -13,10 +13,10 @@ use Throwable;
 class Handler extends ExceptionHandler
 {
 
-    private $errorCode;
+    private $code;
     private $msg;
     private $data;
-    private $code;
+    private $status;
 
 
     /**
@@ -63,10 +63,10 @@ class Handler extends ExceptionHandler
     public function render($request, Throwable $exception)
     {
         if ($exception instanceof BaseExceptions) {
-            $this->errorCode = $exception->errorCode;
+            $this->code = $exception->code;
             $this->msg = $exception->msg;
             $this->data = $exception->data;
-            $this->code = $exception->code;
+            $this->status = $exception->status;
         } else {
             if (config('app.debug')) {
                 if (method_exists($exception, 'render') && $response = $exception->render($request)) {
@@ -86,16 +86,16 @@ class Handler extends ExceptionHandler
             } else {
                 $this->errorCode = $exception->errorCode;
                 $this->msg = '服务器内部错误，不想告诉你';
-                $this->code = 500;
+                $this->status = 500;
 //                $this->recordErrorLog($exception);
             }
         }
         $result = [
-            'error_code' => $this->errorCode,
+            'code' => $this->code,
             'msg' => $this->msg,
             'data' => $this->data,
         ];
-        return response()->json($result, $this->code);
+        return response()->json($result, $this->status);
     }
 
     /*

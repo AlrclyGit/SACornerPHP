@@ -9,7 +9,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Exceptions\ProductExceptions;
+use App\Exceptions\EmptyException;
 use App\Http\Requests\Count;
 use App\Http\Requests\IDMustBePositiveInt;
 use App\Models\Product;
@@ -32,10 +32,10 @@ class ProductController extends Controller
         $products = Product::getMostRecent($validated['count']);
         // 错误处理与隐藏字段并返回
         if ($products->isEmpty()) {
-            throw new ProductExceptions();
+            throw new EmptyException(40005,'获取的最新商品不存在');
         }
         $products = $products->makeHidden(['summary']);
-        return $products;
+        return saReturn($products);
     }
 
     /*
@@ -49,10 +49,10 @@ class ProductController extends Controller
         $products = Product::getProductsByCategoryID($validated['id']);
         // 错误处理与隐藏字段并返回
         if ($products->isEmpty()) {
-            throw new ProductExceptions();
+            throw new EmptyException(40006,'获取的分类商品不存在');
         }
         $products = $products->makeHidden(['summary']);
-        return $products;
+        return saReturn($products);
     }
 
     /*
@@ -66,9 +66,9 @@ class ProductController extends Controller
         $product = Product::getProductDetail($validated['id']);
         // 错误处理与隐藏字段并返回
         if (!$product) {
-            throw new ProductExceptions();
+            throw new EmptyException(40007,'获取的商品详情不存在');
         }
-        return $product;
+        return saReturn($product);
     }
 
 }

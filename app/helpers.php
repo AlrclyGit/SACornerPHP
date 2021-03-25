@@ -41,12 +41,26 @@ function getRandChar($length = 16)
 /**
  * 正常的返回值
  */
-function saReturn($data = [],$msg ='YesOK',$errorCoce = 0)
+function saReturn(...$info)
 {
-    $result = [
-        'error_code' => $errorCoce,
-        'msg' => $msg,
-        'data' => $data,
-    ];
+    //
+    $result = [];
+    //
+    $funcNum = func_num_args();
+    if ($funcNum == 0) {
+        $result = null;
+    } elseif ($funcNum == 1) {
+        $result = $info[0];
+    } elseif ($funcNum == 2) {
+        $result['code'] = $info[0];
+        $result['msg'] = $info[1];
+    } elseif ($funcNum == 3) {
+        $result['code'] = $info[0];
+        $result['msg'] = $info[1];
+        $result['data'] = $info[2];
+    } else {
+        return 'ERROR';
+    }
+    //
     return response()->json($result, 200);
 }

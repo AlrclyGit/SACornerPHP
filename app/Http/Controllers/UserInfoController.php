@@ -9,8 +9,7 @@
 
 namespace App\Http\Controllers;
 
-
-use App\Exceptions\UserException;
+use App\Exceptions\EmptyException;
 use App\Models\User;
 use App\Service\TokenService;
 use Illuminate\Http\Request;
@@ -28,10 +27,7 @@ class UserInfoController extends Controller
         $user = User::find($uid);
         // 判断用户地址是否存在
         if (!$user['nick_name']) {
-            throw new UserException([
-                'msg' => '用户昵称信息缺失',
-                'errorCode' => '30002'
-            ]);
+            throw new EmptyException(30002, '用户昵称信息缺失');
         }
         // 返回成功消息
         return saReturn($user);
@@ -69,10 +65,7 @@ class UserInfoController extends Controller
             $user->country = $userInfo['country'];
             $user->save();
         } else {
-            throw new UserException([
-                'msg' => '用户信息签名校验失败',
-                'errorCode' => '30003'
-            ]);
+            throw new EmptyException(30003, '用户信息签名校验失败');
         }
     }
 }

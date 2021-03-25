@@ -11,7 +11,8 @@ namespace App\Service;
 
 
 use App\Enums\OrderStatusEnum;
-use App\Exceptions\BaseExceptions;
+use App\Exceptions\EmptyException;
+use App\Exceptions\ReturnException;
 use App\Models\Order;
 use App\Models\User;
 
@@ -27,10 +28,7 @@ class PayService
     function __construct($orderID)
     {
         if (!$orderID) {
-            throw new BaseExceptions([
-                'errorCode' => 82001,
-                'msg' => '订单号不允许为NULL'
-            ]);
+            throw new EmptyException(82001, '订单号不允许为NULL');
         }
         $this->orderID = $orderID;
     }
@@ -54,24 +52,15 @@ class PayService
         // 订单号根本不存在
         $order = Order::find($this->orderID);
         if (!$order) {
-            throw new BaseExceptions([
-                'errorCode' => 82002,
-                'msg' => '订单不存在，请检查ID'
-            ]);
+            throw new EmptyException(82002, '订单不存在，请检查ID');
         }
         // 订单号和当前用户不匹配
         if (!TokenService::isValidOperate($order->user_id)) {
-            throw new BaseExceptions([
-                'errorCode' => 82002,
-                'msg' => '订单用户与订单用户不匹配'
-            ]);
+            throw new EmptyException(82002, '订单用户与订单用户不匹配');
         }
         // 订单已支付
         if ($order->status != OrderStatusEnum::UNPAID) {
-            throw new BaseExceptions([
-                'errorCode' => 82003,
-                'msg' => '订单已支付过啦',
-            ]);
+            throw new ReturnException(82003, '订单已支付过啦');
         }
         return $order;
     }
@@ -87,10 +76,7 @@ class PayService
         $user = User::find($uid);
         // 判断用户是否存在
         if (!$user['openid']) {
-            throw new BaseExceptions([
-                'errorCode' => 82004,
-                'msg' => '用户OpenID不存在',
-            ]);
+            throw new EmptyException(82004, '用户OpenID不存在');
         }
         // 拼装预订单请求参数
         $wxOrderData = new \WxPayUnifiedOrder();

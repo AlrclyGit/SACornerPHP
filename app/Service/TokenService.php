@@ -11,7 +11,7 @@ namespace App\Service;
 
 
 use App\Enums\ScopeEnum;
-use App\Exceptions\ForbiddenException;
+use App\Exceptions\ThronesException;
 use App\Exceptions\TokenException;
 use Illuminate\Support\Facades\Request;
 
@@ -117,7 +117,7 @@ class TokenService
             if ($scope == ScopeEnum::User) {
                 return true;
             } else {
-                throw new ForbiddenException(10001, '用户权限不够');
+                throw new ThronesException(10001, '用户权限不够');
             }
         } else {
             throw new TokenException(20002, '获取不到Token的权限信息');
@@ -135,7 +135,7 @@ class TokenService
             if ($scope == ScopeEnum::User) {
                 return true;
             } else {
-                throw new ForbiddenException(10001, '用户权限不够');
+                throw new ThronesException(10001, '用户权限不够');
             }
         } else {
             throw new TokenException(20002, '获取不到Token的权限信息');

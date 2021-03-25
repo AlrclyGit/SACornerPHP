@@ -11,7 +11,7 @@ namespace App\Service;
 
 
 use App\Enums\ScopeEnum;
-use App\Exceptions\WeChatException;
+use App\Exceptions\TokenException;
 use App\Models\User;
 
 class UserTokenService extends TokenService
@@ -45,12 +45,12 @@ class UserTokenService extends TokenService
         $wxResult = json_decode($result, true);
         // 如果结果为空
         if (empty($wxResult)) {
-            throw new WeChatException($wxResult, 91001, '获取session_key及openID时异常，微信内部错误');
+            throw new TokenException(91001, '获取session_key及openID时异常，微信内部错误', $wxResult);
         } else {
             // 如果结果存在错误
             $loginFail = array_key_exists('errcode', $wxResult);
             if ($loginFail) {
-                throw new WeChatException($wxResult, 91002, 'code可能是无效的');
+                throw new TokenException(91002, 'code可能是无效的', $wxResult);
             }
         }
         // 传入获取 Token 的方法并返回

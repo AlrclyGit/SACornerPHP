@@ -1,6 +1,6 @@
 <?php
 /**
- * Name:
+ * Name: Token异常类
  * User: 萧俊介
  * Date: 2020/9/3
  * Time: 5:21 下午
@@ -12,9 +12,8 @@ namespace App\Exceptions;
 
 class TokenException extends BaseExceptions
 {
-    public function __construct($errorCode = 20000, $msg = 'Token相关错误', $data = [], $code = 401)
+    public function __construct($code, $msg, $data = [])
     {
-        parent::__construct($errorCode, $msg, $data, $code);
+        parent::__construct(401, $code, $msg, $data);
     }
-
 }

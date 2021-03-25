@@ -10,7 +10,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Exceptions\ThemeExceptions;
+use App\Exceptions\EmptyException;
 use App\Http\Requests\IDCollection;
 use App\Http\Requests\IDMustBePositiveInt;
 use App\Models\Theme;
@@ -33,9 +33,9 @@ class ThemeController extends Controller
         $result = Theme::getThemeByIds($ids);
         // 错误处理与返回
         if ($result->isEmpty()) {
-            throw new ThemeExceptions();
+            throw new EmptyException(40002,'请求的专题组没有商品');
         }
-        return $result;
+        return saReturn($result);
     }
 
     /*
@@ -50,9 +50,9 @@ class ThemeController extends Controller
         $result = Theme::getThemeWithProducts($validated['id']);
         // 错误处理与返回
         if (!$result) {
-            throw new ThemeExceptions();
+            throw new EmptyException(40008,'请求的专题商品不存在');
         }
-        return $result;
+        return saReturn($result);
     }
 
 }

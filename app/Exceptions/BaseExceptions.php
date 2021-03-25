@@ -15,24 +15,24 @@ class BaseExceptions extends RuntimeException
 {
 
     // 自定义的错误码
-    public $errorCode;
+    public $code;
     // 错误具体信息
     public $msg;
     // 附带的内容
     public $data;
     // 状态码
-    public $code;
+    public $status;
 
     /*
      *
      */
-    public function __construct($errorCode, $msg, $data, $code)
+    public function __construct($status,...$info)
     {
         parent::__construct();
-        $this->errorCode = $errorCode;
-        $this->msg = $msg;
-        $this->data = $data;
-        $this->code = $code;
+        $this->code = $info[0];
+        $this->msg = $info[1];
+        $this->data = $info[2];
+        $this->status = $status;
     }
 
 
